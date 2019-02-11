@@ -58,7 +58,9 @@ class Hopfield(object):
         for i, pattern in enumerate(self.memory_patterns):
             answers[i] = self.recall(pattern)
 
-        return answers
+        answer = np.all(answers)
+        
+        return answer
 
 
 if __name__ == '__main__':
@@ -68,7 +70,3 @@ if __name__ == '__main__':
 
     hopfield = Hopfield(memory_patterns)
 
-    for pattern in memory_patterns:
-        hopfield.recall(pattern)
-
-    hopfield.recall_all()
