@@ -1,6 +1,6 @@
 import numpy as np
 import Utils
-
+import random as rand
 
 class Hopfield(object):
     def __init__(self, memory_patterns):
@@ -67,10 +67,11 @@ class Hopfield(object):
 
     def update(self, x):
         weights = self.weight_matrix
-        random_matrix = np.random.randint(0, len(x), (1, len(x)))
+        random_matrix = rand.sample(range(0, len(x)), len(x))
+        # random_matrix = np.random.randint(0, len(x), (1, len(x)))
         result = [0] * len(x)
-        for i in range(len(random_matrix[0])):
-            temp = np.dot(weights[random_matrix[0][i]], x)
+        for i in range(len(random_matrix)):
+            temp = np.dot(weights[random_matrix[i]], x)
             if temp >= 0:
                 result[i] = 1
             else:
