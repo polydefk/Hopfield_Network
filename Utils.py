@@ -7,4 +7,7 @@ def activation_dynamic(w, x, theta=0):
         if ~np.isnan(w[j]):
             value += np.dot(w[j], x[j]) - theta
 
-    return np.sign(value)
+    if value >= 0:
+        return 1
+    else:
+        return -1
