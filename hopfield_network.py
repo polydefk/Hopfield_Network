@@ -5,7 +5,7 @@ import Utils
 class Hopfield(object):
     def __init__(self, memory_patterns):
         self.memory_patterns = memory_patterns
-        self.weight_matrix = self.create_weight_matrix()
+        self.weight_matrix = self.update_weights()
 
     def initialize_weights(self):
         """ Initilize the weights with zeros except the diagonal wich is NaN
@@ -16,13 +16,16 @@ class Hopfield(object):
         np.fill_diagonal(matrix, np.nan)
         return matrix
 
-    def create_weight_matrix(self):
+    def update_weights(self):
 
-        """ Creates the weight matrix through hebbian weights change
+        """ updates the weight matrix through hebbian weights change
             :returns the matrix
         """
 
-        w = self.initialize_weights()
+        if not hasattr(self, 'weight_matrix'):
+            self.weight_matrix = self.initialize_weights()
+
+        w = self.weight_matrix
         N = self.memory_patterns.shape[1]
 
         for pattern in memory_patterns:
@@ -35,7 +38,7 @@ class Hopfield(object):
             w = np.add(w, temp)
 
         # self.weight_matrix = w
-
+        print(w)
         return w
 
     def recall(self, x):
@@ -51,7 +54,7 @@ class Hopfield(object):
         return answer
 
     def recall_all(self):
-        """:returns an array of booleans if the model is stable from input matrix x"""
+        """:returns a boolean if the model is stable from matrix input x"""
 
         answers = np.full(self.memory_patterns.shape[0], False, dtype=bool)
 
@@ -59,7 +62,7 @@ class Hopfield(object):
             answers[i] = self.recall(pattern)
 
         answer = np.all(answers)
-        
+
         return answer
 
 
@@ -70,3 +73,6 @@ if __name__ == '__main__':
 
     hopfield = Hopfield(memory_patterns)
 
+    x1d = [1, -1, 1, -1, 1, -1, -1, 1]
+    x2d = [1, 1, -1, -1, -1, 1, -1, -1]
+    x3d = [1, 1, 1, -1, 1, 1, -1, 1]
