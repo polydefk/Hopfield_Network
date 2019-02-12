@@ -1,14 +1,12 @@
-import itertools
 import random
-
 import numpy as np
 
 
 class Hopfield(object):
-    def __init__(self, memory_patterns, batch=True):
+    def __init__(self, memory_patterns, method='Batch'):
         self.memory_patterns = memory_patterns
-        self.batch = batch
-        # self.update_weights()
+
+        self.method = method
 
     def initialize_weights(self):
         """ Initilize the weights with zeros except the diagonal wich is NaN
@@ -30,47 +28,54 @@ class Hopfield(object):
         if not hasattr(self, 'weight_matrix'):
             self.weight_matrix = self.initialize_weights()
 
-        if self.batch:
+        if self.method is 'Batch':
             for pattern in memory_patterns:
                 self.weight_matrix = np.add(np.outer(np.transpose(pattern), pattern), self.weight_matrix)
                 np.fill_diagonal(self.weight_matrix, 0)
 
-    def recall(self, x, i=-1, n_iterations=None):
-        """:returns the prediction of how many values are wrong and the number of iterations
-            it used to converge."""
+    def recall(self, pattern, i=-1, n_iterations=None):
+        """:returns the attractor if this pattern is attractor
+            or the pattern that minimizes the error
+            or nothing"""
+
         error = 1
         iter = 0
         update = []
+
         if n_iterations is None:
             n_iterations = int(np.log(self.weight_matrix.shape[0])) + 1
 
-        if self.batch:
+        if self.method is 'Batch':
             update = self.update_batch
+
+        if self.method is "Random":
+            update = self.update_random
 
         while error > 0:
 
-            new_x = update(x)
-            # print("New x value  {}".format(new_x))
-            # print("Real pattern {}".format(self.memory_patterns[i]))
-            # print()
+            new_x = update(pattern)
+
             if i > 0:
                 error = np.sum(np.abs(np.subtract(new_x, self.memory_patterns[i])))
-            # print(error)
-            x = new_x.copy()
+
             iter += 1
 
-            if iter is n_iterations:
+            if np.array_equal(pattern, new_x):
+                return pattern
+
+            pattern = new_x.copy()
+
+            if iter == n_iterations:
                 break
 
+        if i > 0:
+            return pattern
 
-        print("End of recall epochs needed {}".format(iter))
-        # print()
-        return x
+        # print("End of recall epochs needed {}".format(iter))
 
     def update_batch(self, x):
-
+        """:returns"""
         result = np.dot(self.weight_matrix, x)
-        # print(result)
         result[result >= 0] = 1.
         result[result < 0] = -1.
 
@@ -92,36 +97,4 @@ class Hopfield(object):
 
 
 if __name__ == '__main__':
-    memory_patterns = np.array([[-1., -1., 1., -1., 1., -1., -1., 1.],
-                                [-1., -1., -1., -1., -1., 1., -1., -1.],
-                                [-1., 1., 1., -1., -1., 1., -1., 1.]])
-
-    hopfield = Hopfield(memory_patterns)
-    hopfield.train()
-
-    distorted = np.array([[1, -1, 1, -1, 1, -1, -1, 1],
-                          [1, 1, -1, -1, -1, 1, -1, -1],
-                          [1, 1, 1, -1, 1, 1, -1, 1]])
-
-    value = np.zeros(distorted.shape[1])
-    for i, pattern in enumerate(distorted):
-        value = hopfield.recall(pattern, i)
-        print(np.array_equal(value, memory_patterns[i]))
-
-    lst = [list(i) for i in itertools.product([-1., 1.], repeat=8)]
-    lst = np.array(lst)
-
-
-
-    attractors = []
-    for i in range(len(lst)):
-
-        pattern = lst[i]
-
-        value = hopfield.recall(pattern)
-
-        if not value.tolist() in attractors:
-            attractors.append(value.tolist())
-
-    print(len(attractors))
-
+    pass
