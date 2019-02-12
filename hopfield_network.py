@@ -1,6 +1,11 @@
 import random
 import numpy as np
+<<<<<<< HEAD
 
+=======
+import Utils
+import random as rand
+>>>>>>> f08213942b74a5245ba514ebc452d2f7b31bd042
 
 class Hopfield(object):
     def __init__(self, memory_patterns, method='Batch'):
@@ -14,7 +19,11 @@ class Hopfield(object):
         """
         N = self.memory_patterns.shape[1]
         matrix = np.zeros((N, N))
+<<<<<<< HEAD
 
+=======
+        np.fill_diagonal(matrix, 0)
+>>>>>>> f08213942b74a5245ba514ebc452d2f7b31bd042
         return matrix
 
     def train(self, memory_patterns=None):
@@ -42,8 +51,14 @@ class Hopfield(object):
         iter = 0
         update = []
 
+<<<<<<< HEAD
         if n_iterations is None:
             n_iterations = int(np.log(self.weight_matrix.shape[0])) + 1
+=======
+        # self.weight_matrix = w
+        # print(w)
+        return w
+>>>>>>> f08213942b74a5245ba514ebc452d2f7b31bd042
 
         if self.method is 'Batch':
             update = self.update_batch
@@ -68,8 +83,26 @@ class Hopfield(object):
             if iter == n_iterations:
                 break
 
+<<<<<<< HEAD
         if i > 0:
             return pattern
+=======
+    def update(self, x):
+        weights = self.weight_matrix
+        random_matrix = rand.sample(range(0, len(x)), len(x))
+        # random_matrix = np.random.randint(0, len(x), (1, len(x)))
+        result = [0] * len(x)
+        for i in range(len(random_matrix)):
+            temp = np.dot(weights[random_matrix[i]], x)
+            if temp >= 0:
+                result[i] = 1
+            else:
+                result[i] = -1
+        print(result)
+        return result
+
+
+>>>>>>> f08213942b74a5245ba514ebc452d2f7b31bd042
 
         # print("End of recall epochs needed {}".format(iter))
 
@@ -84,6 +117,7 @@ class Hopfield(object):
     def update_random(self, x):
         rand_index = random.sample(range(0, len(x)), len(x))
 
+<<<<<<< HEAD
         result = np.zeros(len(x))
 
         for i in range(len(rand_index)):
@@ -98,3 +132,26 @@ class Hopfield(object):
 
 if __name__ == '__main__':
     pass
+=======
+    x1d = [1, -1, 1, -1, 1, -1, -1, 1]
+    x2d = [1, 1, -1, -1, -1, 1, -1, -1]
+    x3d = [1, 1, 1, -1, 1, 1, -1, 1]
+
+    input = hopfield.update(x1d)
+    for i in range(100):
+        input2 = hopfield.update(input)
+        if np.array_equal(np.asarray(input), np.asarray(input2)):
+            print(i)
+            break
+        else:
+            input = input2
+
+
+
+
+
+
+
+
+
+>>>>>>> f08213942b74a5245ba514ebc452d2f7b31bd042
