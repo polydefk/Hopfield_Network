@@ -10,7 +10,7 @@ class Hopfield(object):
         self.method = method
 
     def initialize_weights(self):
-        """ Initilize the weights with zeros except the diagonal wich is NaN
+        """ Initilize the weights with zeros except the diagonal which is NaN
             :returns the initialized matrix matrix
         """
         N = self.memory_patterns.shape[1]
@@ -38,7 +38,7 @@ class Hopfield(object):
             or the pattern that minimizes the error
             or nothing"""
 
-        error = 1
+        # error = 1
         iter = 0
         update = []
 
@@ -51,12 +51,12 @@ class Hopfield(object):
         if self.method is "Random":
             update = self.update_random
 
-        while error > 0:
+        while True:
 
             new_x = update(pattern)
 
-            if i > 0:
-                error = np.sum(np.abs(np.subtract(new_x, self.memory_patterns[i])))
+            # if i > 0:
+            #     error = np.sum(np.abs(np.subtract(new_x, self.memory_patterns[i])))
 
             iter += 1
             print(iter)

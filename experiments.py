@@ -10,13 +10,14 @@ def check_stability(hopfield, distorted, memory_patterns):
 
     stability = []
     for i, pattern in enumerate(distorted):
-        value = hopfield.recall(pattern, i)
+        value = hopfield.recall(pattern)
+
         # print("The case of x{}d is {}"
         #       .format(i, np.array_equal(value, memory_patterns[i])))
 
         stability.append(np.array_equal(value, memory_patterns[i]))
 
-    return np.all(stability)
+    return stability
 
 
 def ex_3_1_1():
@@ -31,11 +32,8 @@ def ex_3_1_1():
                           [1, 1, -1, -1, -1, 1, -1, -1],
                           [1, 1, 1, -1, 1, 1, -1, 1]])
 
-    check_stability(hopfield, distorted, memory_patterns)
+    print(check_stability(hopfield, distorted, memory_patterns))
 
-    for i, pattern in enumerate(distorted):
-        value = hopfield.recall(pattern, i)
-        print("The case of x{}d is {}".format(i, np.array_equal(value, memory_patterns[i])))
 
 
 def ex_3_1_2():
@@ -56,8 +54,7 @@ def ex_3_1_2():
         if value is not None:
             attractors.append(value)
 
-    attractors = np.array(attractors)
-    uniques = np.unique(attractors, axis=0)
+    uniques = np.unique(np.array(attractors), axis=0)
 
     print("The number of attractors is {}".format(len(uniques)))
 
@@ -72,7 +69,9 @@ def ex_3_1_3():
 
     distorted = np.array([[1, 1, 1, 1, 1, -1, 1, 1]])
 
-    check_stability(hopfield, distorted, memory_patterns)
+    distorted = np.repeat(distorted, 3, axis=0)
+
+    print(check_stability(hopfield, distorted, memory_patterns))
 
 
 def ex_3_2():
@@ -108,8 +107,8 @@ def ex_3_2():
         Utils.display_image(p11, title='actual picture p11 (Mixture p2 and p3)')
         Utils.display_image(recall_p11, title='recalled picture p11')
 
-        print(check_stability(hopfield, recall_p10, train_patterns))
-        print(check_stability(hopfield, recall_p11, train_patterns))
+        print(np.all(check_stability(hopfield, recall_p10, train_patterns)))
+        print(np.all(check_stability(hopfield, recall_p11, train_patterns)))
 
     if test_3_2:
         hopfield = Hopfield(train_patterns, method='Random')
@@ -123,4 +122,4 @@ if __name__ == "__main__":
     # ex_3_1_1()
     # ex_3_1_2()
     # ex_3_1_3()
-    ex_3_2()
+    # ex_3_2()
