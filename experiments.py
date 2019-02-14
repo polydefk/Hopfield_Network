@@ -115,7 +115,21 @@ def ex_3_2():
         hopfield.train()
         p10 = dataset[9].copy()
 
-        recalled = hopfield.recall(p10, n_iterations=2000)
+        Utils.display_image(p10, title='actual picture p10')
+
+        hopfield.recall(p10, n_iterations=5000)
+
+def ex_3_3_1():
+    dataset = np.loadtxt('pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
+    train_patterns = dataset[0:3].copy()
+
+    hopfield = Hopfield(train_patterns)
+    hopfield.train()
+
+    print(hopfield.calculate_energy(train_patterns[0]))
+    print(hopfield.calculate_energy(train_patterns[1]))
+    print(hopfield.calculate_energy(train_patterns[2]))
+
 
 
 if __name__ == "__main__":
@@ -123,3 +137,4 @@ if __name__ == "__main__":
     # ex_3_1_2()
     # ex_3_1_3()
     # ex_3_2()
+    ex_3_3_1()
