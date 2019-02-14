@@ -1,4 +1,15 @@
 import numpy as np
+import matplotlib.pyplot as plt
+
+def display_image(image, title):
+    image = np.reshape(image, (32, 32))
+
+    plt.figure()
+    plt.imshow(image)
+    plt.title(title)
+    plt.grid(True)
+    # plt.savefig('pictures/3_2/{}.png'.format(title.replace(' ', '_')))
+    plt.show()
 
 
 def activation_dynamic(w, x, theta=0):

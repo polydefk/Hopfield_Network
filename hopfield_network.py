@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import Utils
 
 
 class Hopfield(object):
@@ -28,10 +29,9 @@ class Hopfield(object):
         if not hasattr(self, 'weight_matrix'):
             self.weight_matrix = self.initialize_weights()
 
-        if self.method is 'Batch':
-            for pattern in memory_patterns:
-                self.weight_matrix = np.add(np.outer(np.transpose(pattern), pattern), self.weight_matrix)
-                np.fill_diagonal(self.weight_matrix, 0)
+        for pattern in memory_patterns:
+            self.weight_matrix = np.add(np.outer(np.transpose(pattern), pattern), self.weight_matrix)
+        # np.fill_diagonal(self.weight_matrix, 0)
 
     def recall(self, pattern, i=-1, n_iterations=None):
         """:returns the attractor if this pattern is attractor
@@ -59,17 +59,20 @@ class Hopfield(object):
                 error = np.sum(np.abs(np.subtract(new_x, self.memory_patterns[i])))
 
             iter += 1
-
-            if np.array_equal(pattern, new_x):
-                return pattern
+            print(iter)
+            #
+            # if np.array_equal(pattern, new_x):
+            #     return pattern
 
             pattern = new_x.copy()
+
+            if iter % 100 == 0:
+                Utils.display_image(pattern, '')
 
             if iter == n_iterations:
                 break
 
-        if i > 0:
-            return pattern
+        return pattern
 
         # print("End of recall epochs needed {}".format(iter))
 
@@ -86,13 +89,13 @@ class Hopfield(object):
 
         result = np.zeros(len(x))
 
-        for i in range(len(rand_index)):
-            temp = np.dot(self.weight_matrix[rand_index[i]], x)
+        for i in range(len(x)):
+            index = random.randint(0, len(x) - 1)
+            temp = np.dot(self.weight_matrix[index], x)
             if temp >= 0:
                 result[i] = 1
             else:
                 result[i] = -1
-
         return result
 
 
