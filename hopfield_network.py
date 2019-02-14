@@ -59,15 +59,16 @@ class Hopfield(object):
             #     error = np.sum(np.abs(np.subtract(new_x, self.memory_patterns[i])))
 
             iter += 1
-            print(iter)
-            #
+            # print(iter)
+
             # if np.array_equal(pattern, new_x):
+            #     print('same pattern at iter : {0} '.format(iter))
             #     return pattern
 
             pattern = new_x.copy()
 
-            if iter % 100 == 0:
-                Utils.display_image(pattern, '')
+            if iter % 1000 == 0:
+                Utils.display_image(pattern, 'recalled picture at {0}th iteration'.format(iter))
 
             if iter == n_iterations:
                 break
@@ -85,18 +86,21 @@ class Hopfield(object):
         return result
 
     def update_random(self, x):
-        rand_index = random.sample(range(0, len(x)), len(x))
-
         result = np.zeros(len(x))
 
         for i in range(len(x)):
             index = random.randint(0, len(x) - 1)
-            temp = np.dot(self.weight_matrix[index], x)
-            if temp >= 0:
+            value = np.dot(self.weight_matrix[index], x)
+            if value >= 0:
                 result[i] = 1
             else:
                 result[i] = -1
         return result
+
+    def calculate_energy(self, training_data):
+
+        result = np.matmul(self.weight_matrix, training_data)
+        return -np.dot(result, training_data)
 
 
 if __name__ == '__main__':

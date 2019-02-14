@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def display_image(image, title):
     image = np.reshape(image, (32, 32))
 
@@ -22,3 +23,4 @@ def activation_dynamic(w, x, theta=0):
     value[value == 0] = 1
 
     return value
+
