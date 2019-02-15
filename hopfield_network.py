@@ -4,9 +4,12 @@ import Utils
 
 
 class Hopfield(object):
-    def __init__(self, memory_patterns, method='Batch'):
+    def __init__(self, memory_patterns, method='Batch', random_weights=False, make_weights_symmetric=False):
         self.memory_patterns = memory_patterns
         self.method = method
+        self.random_weights = random_weights
+        self.make_weights_symmetric = make_weights_symmetric
+
 
     def initialize_weights(self):
         """ Initilize the weights with zeros except the diagonal which is NaN
@@ -14,6 +17,13 @@ class Hopfield(object):
         """
         N = self.memory_patterns.shape[1]
         matrix = np.zeros((N, N))
+
+        if self.random_weights:
+            matrix = np.random.randn(N, N)
+
+        if self.make_weights_symmetric:
+            matrix = np.random.randn(N, N)
+            matrix = 0.5 * (matrix + matrix.T)
 
         return matrix
 
@@ -32,7 +42,7 @@ class Hopfield(object):
             self.weight_matrix = np.add(np.outer(np.transpose(pattern), pattern), self.weight_matrix)
         # np.fill_diagonal(self.weight_matrix, 0)
 
-    def recall(self, pattern, n_iterations=None, method=None, calculate_energy=False):
+    def recall(self, pattern, n_iterations=None, method=None, calculate_energy=False, plot=False):
         """:returns the attractor if this pattern is attractor
             or the pattern that minimizes the error
             or nothing"""
@@ -43,7 +53,7 @@ class Hopfield(object):
         if n_iterations is None:
             n_iterations = int(np.log(self.weight_matrix.shape[0])) + 1
 
-        energy = np.zeros(n_iterations)
+        energy = []
 
         if method is not None:
             self.method = method
@@ -61,23 +71,23 @@ class Hopfield(object):
 
             new_x = update(pattern)
 
-            # if np.array_equal(pattern, new_x):
-                # print('found attractor at iter : {0} '.format(iter))
-                # return [pattern, energy]
+            if np.array_equal(pattern, new_x):
+                print('found attractor at iter : {0} '.format(iter))
+                return [pattern, np.array(energy)]
 
             pattern = new_x.copy()
 
             if calculate_energy:
-                energy[iter] = self.calculate_energy(pattern)
+                energy.append(self.calculate_energy(pattern))
 
             iter += 1
-            if iter % 150 == 0:
+            if iter % 150 == 0 and plot:
                 Utils.display_image(pattern, 'recalled picture at {0}th iteration'.format(iter))
 
             if iter == n_iterations:
                 break
 
-        return [pattern, energy]
+        return [pattern, np.array(energy)]
 
 
     def update_synchronous_batch(self, x):
