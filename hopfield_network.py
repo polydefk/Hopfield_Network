@@ -50,6 +50,9 @@ class Hopfield(object):
         iter = 1
         update = []
 
+        if not hasattr(self, 'weight_matrix'):
+            self.weight_matrix = self.initialize_weights()
+
         if n_iterations is None:
             n_iterations = int(np.log(self.weight_matrix.shape[0])) + 1
 

@@ -167,7 +167,6 @@ def ex_3_3_4():
     train_patterns = dataset[0:3].copy()
 
     hopfield = Hopfield(train_patterns, random_weights=True)
-    hopfield.train()
 
     start_state = np.random.randn(len(dataset[0]))
 
@@ -180,7 +179,6 @@ def ex_3_3_5():
     train_patterns = dataset[0:3].copy()
 
     hopfield = Hopfield(train_patterns, make_weights_symmetric=True)
-    hopfield.train()
 
     start_state = np.random.randn(len(dataset[0]))
 
@@ -230,6 +228,6 @@ if __name__ == "__main__":
     # ex_3_2()
     # ex_3_3__1_until_3()
 
-    # ex_3_3_4()
-    # ex_3_3_5()
-    ex_3_4()
+    ex_3_3_4()
+    ex_3_3_5()
+    # ex_3_4()
