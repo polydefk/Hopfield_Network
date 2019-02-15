@@ -3,6 +3,8 @@ import numpy as np
 import Utils
 from hopfield_network import Hopfield
 
+np.random.seed(0)
+
 
 def check_stability(hopfield, distorted, memory_patterns):
     if len(distorted.shape) < 2:
@@ -118,6 +120,8 @@ def ex_3_2():
         recalled, _ = hopfield.recall(p10, n_iterations=500)
         Utils.display_image(recalled, 'Asynchronous random update. closest to first training example')
 
+
+# SOMETHING MAY BE WRONG NO SENSE MAKES THE ENERGY PLOTS
 def ex_3_3__1_until_3():
     dataset = np.loadtxt('pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
     train_patterns = dataset[0:3].copy()
@@ -142,17 +146,46 @@ def ex_3_3__1_until_3():
     # 3.3.3 Follow how the energy changes from iteration to iteration
     # when you use the sequential update rule to approach an attractor.
 
-    _, energy = hopfield.recall(train_patterns[0], n_iterations=100, method='Async', calculate_energy=True)
-    Utils.plot_energy_line(energy, 'Energy', 'Energy using non-random asynchronous update to approach an attractor.')
+    # _, energy = hopfield.recall(train_patterns[0], n_iterations=100, method='Async', calculate_energy=True)
+    # Utils.plot_energy_line(energy, 'Energy', 'Energy using non-random asynchronous update to approach an attractor.')
 
-    _, energy = hopfield.recall(dataset[3], n_iterations=100, method='Async', calculate_energy=True)
-    Utils.plot_energy_line(energy, 'Energy', 'Energy non-random asynchronous update to approach a test point.')
+    # _, energy = hopfield.recall(dataset[3], n_iterations=100, method='Async', calculate_energy=True)
+    # Utils.plot_energy_line(energy, 'Energy', 'Energy non-random asynchronous update to approach a test point.')
 
-    _, energy = hopfield.recall(train_patterns[0], n_iterations=100, method='Random', calculate_energy=True)
-    Utils.plot_energy_line(energy, 'Energy', 'Energy using random asynchronous update to approach an attractor.')
+    # _, energy = hopfield.recall(train_patterns[0], n_iterations=100, method='Random', calculate_energy=True)
+    # Utils.plot_energy_line(energy, 'Energy', 'Energy using random asynchronous update to approach an attractor.')
 
     _, energy = hopfield.recall(dataset[3], n_iterations=100, method='Random', calculate_energy=True)
     Utils.plot_energy_line(energy, 'Energy', 'Energy random asynchronous update to approach a test point.')
+
+    _, energy = hopfield.recall(dataset[5], n_iterations=100, method='Random', calculate_energy=True)
+    Utils.plot_energy_line(energy, 'Energy', 'Energy random asynchronous update to approach a test point.')
+
+
+def ex_3_3_4():
+    dataset = np.loadtxt('pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
+    train_patterns = dataset[0:3].copy()
+
+    hopfield = Hopfield(train_patterns, random_weights=True)
+    hopfield.train()
+
+    start_state = np.random.randn(len(dataset[0]))
+
+    recalled, energy = hopfield.recall(start_state, n_iterations=100, method='Random', calculate_energy=True)
+    Utils.plot_energy_line(energy, 'Energy', 'Energy random asynchronous update using random weights')
+
+
+def ex_3_3_5():
+    dataset = np.loadtxt('pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
+    train_patterns = dataset[0:3].copy()
+
+    hopfield = Hopfield(train_patterns, make_weights_symmetric=True)
+    hopfield.train()
+
+    start_state = np.random.randn(len(dataset[0]))
+
+    recalled, energy = hopfield.recall(start_state, n_iterations=100, method='Random', calculate_energy=True)
+    Utils.plot_energy_line(energy, 'Energy', 'Energy random asynchronous update using symmetric weights')
 
 
 if __name__ == "__main__":
@@ -160,4 +193,7 @@ if __name__ == "__main__":
     # ex_3_1_2()
     # ex_3_1_3()
     # ex_3_2()
-    ex_3_3__1_until_3()
+    # ex_3_3__1_until_3()
+
+    ex_3_3_4()
+    ex_3_3_5()

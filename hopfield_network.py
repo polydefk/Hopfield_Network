@@ -10,7 +10,6 @@ class Hopfield(object):
         self.random_weights = random_weights
         self.make_weights_symmetric = make_weights_symmetric
 
-
     def initialize_weights(self):
         """ Initilize the weights with zeros except the diagonal which is NaN
             :returns the initialized matrix matrix
@@ -40,6 +39,7 @@ class Hopfield(object):
 
         for pattern in memory_patterns:
             self.weight_matrix = np.add(np.outer(np.transpose(pattern), pattern), self.weight_matrix)
+
         # np.fill_diagonal(self.weight_matrix, 0)
 
     def recall(self, pattern, n_iterations=None, method=None, calculate_energy=False, plot=False):
@@ -47,7 +47,7 @@ class Hopfield(object):
             or the pattern that minimizes the error
             or nothing"""
 
-        iter = 0
+        iter = 1
         update = []
 
         if n_iterations is None:
@@ -71,24 +71,23 @@ class Hopfield(object):
 
             new_x = update(pattern)
 
+            if calculate_energy:
+                energy.append(self.calculate_energy(new_x))
+
             if np.array_equal(pattern, new_x):
                 print('found attractor at iter : {0} '.format(iter))
                 return [pattern, np.array(energy)]
 
             pattern = new_x.copy()
 
-            if calculate_energy:
-                energy.append(self.calculate_energy(pattern))
-
-            iter += 1
             if iter % 150 == 0 and plot:
                 Utils.display_image(pattern, 'recalled picture at {0}th iteration'.format(iter))
 
             if iter == n_iterations:
                 break
 
+            iter += 1
         return [pattern, np.array(energy)]
-
 
     def update_synchronous_batch(self, x):
         """:returns"""
@@ -100,12 +99,12 @@ class Hopfield(object):
 
     def update_asynchronous_random(self, x):
         result = np.zeros(len(x))
-
         order = np.arange(len(x))
         np.random.shuffle(order)
 
         for i in order:
             value = np.dot(self.weight_matrix[i], x)
+
             if value >= 0:
                 result[i] = 1
             else:
@@ -116,12 +115,15 @@ class Hopfield(object):
         result = np.zeros(len(x))
 
         for i in range(len(x)):
-            value = np.dot(self.weight_matrix[i], x)
+            # value = np.dot(self.weight_matrix[i], x)
+            value = np.sum(np.multiply(self.weight_matrix[i, :], x))
+
             if value >= 0:
                 result[i] = 1
             else:
                 result[i] = -1
         return result
+
 
     def calculate_energy(self, training_data):
 
