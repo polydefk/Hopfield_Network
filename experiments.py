@@ -188,6 +188,41 @@ def ex_3_3_5():
     Utils.plot_energy_line(energy, 'Energy', 'Energy random asynchronous update using symmetric weights')
 
 
+def ex_3_4():
+    dataset = np.loadtxt('pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
+    train_patterns = dataset[0:3].copy()
+
+    hopfield = Hopfield(train_patterns)
+    hopfield.train()
+
+    print("original First Image")
+    Utils.display_image(train_patterns[0], 'Original')
+    for percentage in range(10):
+        percentage = percentage / 10 + 0.1
+
+        dist_pic = Utils.distort_data(train_patterns[0], percentage)
+        recalled, energy = hopfield.recall(dist_pic, n_iterations=100)
+        Utils.display_image(recalled, "distorting {}%".format(percentage * 100))
+
+    print("original Second Image")
+    Utils.display_image(train_patterns[1], 'Original')
+    for percentage in range(10):
+        percentage = percentage / 10 + 0.1
+
+        dist_pic = Utils.distort_data(train_patterns[1], percentage)
+        recalled, energy = hopfield.recall(dist_pic, n_iterations=100)
+        Utils.display_image(recalled, "distorting {}%".format(percentage * 100))
+
+    print("original Third Image")
+    Utils.display_image(train_patterns[2], 'Original')
+    for percentage in range(10):
+        percentage = percentage / 10 + 0.1
+
+        dist_pic = Utils.distort_data(train_patterns[2], percentage)
+        recalled, energy = hopfield.recall(dist_pic, n_iterations=100)
+        Utils.display_image(recalled, "distorting {}%".format(percentage * 100))
+
+
 if __name__ == "__main__":
     # ex_3_1_1()
     # ex_3_1_2()
@@ -195,5 +230,6 @@ if __name__ == "__main__":
     # ex_3_2()
     # ex_3_3__1_until_3()
 
-    ex_3_3_4()
-    ex_3_3_5()
+    # ex_3_3_4()
+    # ex_3_3_5()
+    ex_3_4()

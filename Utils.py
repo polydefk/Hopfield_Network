@@ -13,6 +13,17 @@ def display_image(image, title):
     plt.show()
 
 
+def distort_data(pattern, percentage):
+    dim = pattern.size
+
+    dist = int(dim * percentage)
+    dist_pattern = np.copy(pattern)
+
+    np.random.shuffle(dist_pattern[:dist])
+
+    return dist_pattern
+
+
 def activation_dynamic(w, x, theta=0):
     value = 0
     for j in range(w.shape[0]):
