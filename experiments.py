@@ -10,7 +10,7 @@ def check_stability(hopfield, distorted, memory_patterns):
 
     stability = []
     for i, pattern in enumerate(distorted):
-        value = hopfield.recall(pattern)
+        value, _ = hopfield.recall(pattern)
 
         # print("The case of x{}d is {}"
         #       .format(i, np.array_equal(value, memory_patterns[i])))
@@ -35,7 +35,6 @@ def ex_3_1_1():
     print(check_stability(hopfield, distorted, memory_patterns))
 
 
-
 def ex_3_1_2():
     memory_patterns = np.array([[-1., -1., 1., -1., 1., -1., -1., 1.],
                                 [-1., -1., -1., -1., -1., 1., -1., -1.],
@@ -50,7 +49,7 @@ def ex_3_1_2():
     attractors = []
     for i in range(len(lst)):
         pattern = lst[i]
-        value = hopfield.recall(pattern)
+        value, _ = hopfield.recall(pattern)
         if value is not None:
             attractors.append(value)
 
@@ -75,23 +74,22 @@ def ex_3_1_3():
 
 
 def ex_3_2():
-
     test_3_1 = False
     test_3_2 = True
     dataset = np.loadtxt('pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
     train_patterns = dataset[0:3].copy()
 
-    # hopfield = Hopfield(train_patterns)
-    # hopfield.train()
-    # stability = check_stability(hopfield, train_patterns, train_patterns)
-    # print(stability)
+    hopfield = Hopfield(train_patterns)
+    hopfield.train()
+    stability = check_stability(hopfield, train_patterns, train_patterns)
+    print(stability)
 
     if test_3_1:
         hopfield = Hopfield(train_patterns)
         hopfield.train()
 
         p10 = dataset[9].copy()
-        recall_p10 = hopfield.recall(p10)
+        recall_p10, _ = hopfield.recall(p10)
 
         Utils.display_image(p10, title='actual picture p10')
         Utils.display_image(recall_p10, title='recalled picture p10')
@@ -100,7 +98,7 @@ def ex_3_2():
         p3 = dataset[2].copy()
         p11 = dataset[10].copy()
 
-        recall_p11 = hopfield.recall(p11)
+        recall_p11, _ = hopfield.recall(p11)
 
         Utils.display_image(p2, title='actual picture p2')
         Utils.display_image(p3, title='actual picture p3')
@@ -117,19 +115,44 @@ def ex_3_2():
 
         Utils.display_image(p10, title='actual picture p10')
 
-        hopfield.recall(p10, n_iterations=5000)
+        recalled, _ = hopfield.recall(p10, n_iterations=500)
+        Utils.display_image(recalled, 'Asynchronous random update. closest to first training example')
 
-def ex_3_3_1():
+def ex_3_3__1_until_3():
     dataset = np.loadtxt('pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
     train_patterns = dataset[0:3].copy()
 
     hopfield = Hopfield(train_patterns)
     hopfield.train()
 
+    # 3.3.1
+    print('energy at the di􏰂fferent attractors')
     print(hopfield.calculate_energy(train_patterns[0]))
     print(hopfield.calculate_energy(train_patterns[1]))
     print(hopfield.calculate_energy(train_patterns[2]))
 
+    # 3.3.2
+    print('energy at the points of the distorted patterns')
+    print(hopfield.calculate_energy(dataset[3]))
+    print(hopfield.calculate_energy(dataset[4]))
+    print(hopfield.calculate_energy(dataset[5]))
+    print(hopfield.calculate_energy(dataset[6]))
+    print(hopfield.calculate_energy(dataset[7]))
+
+    # 3.3.3 Follow how the energy changes from iteration to iteration
+    # when you use the sequential update rule to approach an attractor.
+
+    _, energy = hopfield.recall(train_patterns[0], n_iterations=100, method='Async', calculate_energy=True)
+    Utils.plot_energy_line(energy, 'Energy', 'Energy using non-random asynchronous update to approach an attractor.')
+
+    _, energy = hopfield.recall(dataset[3], n_iterations=100, method='Async', calculate_energy=True)
+    Utils.plot_energy_line(energy, 'Energy', 'Energy non-random asynchronous update to approach a test point.')
+
+    _, energy = hopfield.recall(train_patterns[0], n_iterations=100, method='Random', calculate_energy=True)
+    Utils.plot_energy_line(energy, 'Energy', 'Energy using random asynchronous update to approach an attractor.')
+
+    _, energy = hopfield.recall(dataset[3], n_iterations=100, method='Random', calculate_energy=True)
+    Utils.plot_energy_line(energy, 'Energy', 'Energy random asynchronous update to approach a test point.')
 
 
 if __name__ == "__main__":
@@ -137,4 +160,4 @@ if __name__ == "__main__":
     # ex_3_1_2()
     # ex_3_1_3()
     # ex_3_2()
-    ex_3_3_1()
+    ex_3_3__1_until_3()
