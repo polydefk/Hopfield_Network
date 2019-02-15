@@ -24,3 +24,18 @@ def activation_dynamic(w, x, theta=0):
 
     return value
 
+
+def plot_energy_line(energy, legend_names, title):
+    # fig config
+    plt.figure()
+    plt.grid(True)
+
+    plt.plot(energy)
+
+    plt.xlabel('Iterations')
+    plt.ylabel('Energy')
+
+    plt.title(title)
+    plt.legend(legend_names, loc='upper left')
+
+    plt.show()
