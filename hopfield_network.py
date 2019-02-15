@@ -61,13 +61,13 @@ class Hopfield(object):
             iter += 1
             # print(iter)
 
-            # if np.array_equal(pattern, new_x):
-            #     print('same pattern at iter : {0} '.format(iter))
-            #     return pattern
+            if np.array_equal(pattern, new_x):
+                print('found attractor at iter : {0} '.format(iter))
+                return pattern
 
             pattern = new_x.copy()
 
-            if iter % 1000 == 0:
+            if iter % 100 == 0:
                 Utils.display_image(pattern, 'recalled picture at {0}th iteration'.format(iter))
 
             if iter == n_iterations:
@@ -88,9 +88,11 @@ class Hopfield(object):
     def update_random(self, x):
         result = np.zeros(len(x))
 
-        for i in range(len(x)):
-            index = random.randint(0, len(x) - 1)
-            value = np.dot(self.weight_matrix[index], x)
+        order = np.arange(len(x))
+        np.random.shuffle(order)
+
+        for i in order:
+            value = np.dot(self.weight_matrix[i], x)
             if value >= 0:
                 result[i] = 1
             else:
