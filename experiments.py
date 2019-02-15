@@ -2,6 +2,7 @@ import itertools
 import numpy as np
 import Utils
 from hopfield_network import Hopfield
+import matplotlib.pyplot as plt
 
 np.random.seed(0)
 
@@ -155,11 +156,11 @@ def ex_3_3__1_until_3():
     # _, energy = hopfield.recall(train_patterns[0], n_iterations=100, method='Random', calculate_energy=True)
     # Utils.plot_energy_line(energy, 'Energy', 'Energy using random asynchronous update to approach an attractor.')
 
-    _, energy = hopfield.recall(dataset[3], n_iterations=100, method='Random', calculate_energy=True)
+    _, energy = hopfield.recall(dataset[10], n_iterations=100, method='Async', calculate_energy=True)
     Utils.plot_energy_line(energy, 'Energy', 'Energy random asynchronous update to approach a test point.')
 
-    _, energy = hopfield.recall(dataset[5], n_iterations=100, method='Random', calculate_energy=True)
-    Utils.plot_energy_line(energy, 'Energy', 'Energy random asynchronous update to approach a test point.')
+    # _, energy = hopfield.recall(dataset[5], n_iterations=100, method='Async', calculate_energy=True)
+    # Utils.plot_energy_line(energy, 'Energy', 'Energy random asynchronous update to approach a test point.')
 
 
 def ex_3_3_4():
@@ -168,9 +169,9 @@ def ex_3_3_4():
 
     hopfield = Hopfield(train_patterns, random_weights=True)
 
-    start_state = np.random.randn(len(dataset[0]))
+    start_state = np.random.normal(0, 1, len(dataset[0]))
 
-    recalled, energy = hopfield.recall(start_state, n_iterations=100, method='Random', calculate_energy=True)
+    recalled, energy = hopfield.recall(dataset[10], n_iterations=100, method='Random', calculate_energy=True)
     Utils.plot_energy_line(energy, 'Energy', 'Energy random asynchronous update using random weights')
 
 
@@ -180,9 +181,9 @@ def ex_3_3_5():
 
     hopfield = Hopfield(train_patterns, make_weights_symmetric=True)
 
-    start_state = np.random.randn(len(dataset[0]))
+    start_state = np.random.normal(0, 1, len(dataset[0]))
 
-    recalled, energy = hopfield.recall(start_state, n_iterations=100, method='Random', calculate_energy=True)
+    recalled, energy = hopfield.recall(dataset[10], n_iterations=100, method='Random', calculate_energy=True)
     Utils.plot_energy_line(energy, 'Energy', 'Energy random asynchronous update using symmetric weights')
 
 
@@ -220,13 +221,19 @@ def ex_3_4():
         recalled, energy = hopfield.recall(dist_pic, n_iterations=100)
         Utils.display_image(recalled, "distorting {}%".format(percentage * 100))
 
+def plot_image():
+    dataset = np.loadtxt('pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
+    pattern = dataset[0].copy()
+    plt.imshow(pattern.reshape((32,32)).T)
+    plt.show()
 
 if __name__ == "__main__":
     # ex_3_1_1()
     # ex_3_1_2()
     # ex_3_1_3()
     # ex_3_2()
-    # ex_3_3__1_until_3()
+    plot_image()
+    ex_3_3__1_until_3()
 
     ex_3_3_4()
     ex_3_3_5()

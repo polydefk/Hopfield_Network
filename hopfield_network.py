@@ -18,11 +18,13 @@ class Hopfield(object):
         matrix = np.zeros((N, N))
 
         if self.random_weights:
-            matrix = np.random.randn(N, N)
+            matrix = np.random.normal(0, 1, size=matrix.shape)
+            # np.fill_diagonal(matrix, 0)
 
         if self.make_weights_symmetric:
-            matrix = np.random.randn(N, N)
-            matrix = 0.5 * (matrix + matrix.T)
+            matrix = np.random.normal(0, 1, size=matrix.shape)
+            matrix = 0.5 * (matrix + np.transpose(matrix))
+            # np.fill_diagonal(matrix, 0)
 
         return matrix
 
@@ -126,7 +128,6 @@ class Hopfield(object):
             else:
                 result[i] = -1
         return result
-
 
     def calculate_energy(self, training_data):
 
