@@ -4,11 +4,13 @@ import Utils
 
 
 class Hopfield(object):
-    def __init__(self, memory_patterns, method='Batch', random_weights=False, make_weights_symmetric=False):
+    def __init__(self, memory_patterns, activity, method='Batch', random_weights=False, make_weights_symmetric=False, sparse_weight=False):
         self.memory_patterns = memory_patterns
         self.method = method
         self.random_weights = random_weights
         self.make_weights_symmetric = make_weights_symmetric
+        self.sparse_weight = sparse_weight
+        self.activity = activity
 
     def initialize_weights(self):
         """ Initilize the weights with zeros except the diagonal which is NaN
@@ -39,8 +41,13 @@ class Hopfield(object):
         if not hasattr(self, 'weight_matrix'):
             self.weight_matrix = self.initialize_weights()
 
-        for pattern in memory_patterns:
-            self.weight_matrix = np.add(np.outer(np.transpose(pattern), pattern), self.weight_matrix)
+        if self.sparse_weight:
+            for pattern in memory_patterns:
+                pattern = np.subtract(pattern,self.activity)
+                self.weight_matrix = np.add(np.outer(pattern.T, pattern), self.weight_matrix)
+        else:
+            for pattern in memory_patterns:
+                self.weight_matrix = np.add(np.outer(np.transpose(pattern), pattern), self.weight_matrix)
 
         # np.fill_diagonal(self.weight_matrix, 0)
 
@@ -72,9 +79,15 @@ class Hopfield(object):
         if self.method is "Async":
             update = self.update_asynchronous
 
-        while True:
+        if self.sparse_weight:
+            update = self.update_sparse
 
-            new_x = update(pattern)
+        while True:
+            new_x = []
+            if self.sparse_weight:
+                new_x = update(pattern, 0)
+            else:
+                new_x = update(pattern)
 
             if calculate_energy:
                 energy.append(self.calculate_energy(new_x))
@@ -133,6 +146,17 @@ class Hopfield(object):
 
         result = np.matmul(self.weight_matrix, training_data)
         return -np.dot(result, training_data)
+
+    def update_sparse(self, x, theta):
+        value = 0
+        for j in range(self.weight_matrix.shape[0]):
+            value += np.dot(self.weight_matrix[j], x[j]) - theta
+
+        value = np.sign(value)
+        value[value == 0] = 1
+        value = 0.5 + 0.5 * value
+
+        return value
 
 
 if __name__ == '__main__':

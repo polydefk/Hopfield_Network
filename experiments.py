@@ -244,6 +244,20 @@ def ex_3_5():
         Utils.display_image(value, "{} pattern".format(j+1))
         Utils.display_image(pattern,"Actual {}".format(j+1))
 
+def ex_3_6():
+    memory_patterns = np.array([[0., 0., 1., 0., 1., 0., 0., 1.],
+                                [0., 0., 0., 0., 0., 1., 0., 0.],
+                                [0., 1., 1., 0., 0., 1., 0., 1.]])
+
+    hopfield = Hopfield(memory_patterns, 0.1, sparse_weight=True)
+    hopfield.train()
+
+    distorted = np.array([[1, 1, 1, 1, 1, 0, 1, 1]])
+
+    distorted = np.repeat(distorted, 3, axis=0)
+
+    print(check_stability(hopfield, distorted, memory_patterns))
+
 
 if __name__ == "__main__":
     # ex_3_1_1()
