@@ -16,10 +16,14 @@ def display_image(image, title):
 def distort_data(pattern, percentage):
     dim = pattern.size
 
-    dist = int(dim * percentage)
-    dist_pattern = np.copy(pattern)
+    n_dist = int(dim * percentage)
 
-    np.random.shuffle(dist_pattern[:dist])
+    idxs = np.random.choice(np.arange(dim), n_dist)
+
+    dist_pattern = pattern.copy()
+
+    dist_pattern[idxs] = pattern[idxs] * (-1)
+    # np.random.shuffle(dist_pattern[:n_dist])
 
     return dist_pattern
 
@@ -50,3 +54,11 @@ def plot_energy_line(energy, legend_names, title):
     plt.legend(legend_names, loc='upper left')
 
     plt.show()
+
+
+if __name__ == "__main__":
+    dataset = np.loadtxt('pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
+
+    train_pattern = dataset[0].copy()
+
+    distort_data(train_pattern, 0.1)

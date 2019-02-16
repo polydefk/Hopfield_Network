@@ -18,7 +18,7 @@ def check_stability(hopfield, distorted, memory_patterns):
         # print("The case of x{}d is {}"
         #       .format(i, np.array_equal(value, memory_patterns[i])))
 
-        stability.append(np.array_equal(value, memory_patterns[i]))
+        # stability.append(np.array_equal(value, memory_patterns[i]))
 
     return stability
 
@@ -221,20 +221,39 @@ def ex_3_4():
         recalled, energy = hopfield.recall(dist_pic, n_iterations=100)
         Utils.display_image(recalled, "distorting {}%".format(percentage * 100))
 
+
 def plot_image():
     dataset = np.loadtxt('pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
     pattern = dataset[0].copy()
-    plt.imshow(pattern.reshape((32,32)).T)
+    plt.imshow(pattern.reshape((32, 32)).T)
     plt.show()
+
+
+def ex_3_5():
+    dataset = np.loadtxt('pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
+
+    train_patterns = dataset[0:4].copy()
+
+    hopfield = Hopfield(train_patterns)
+    hopfield.train()
+
+    for j, pattern in enumerate(train_patterns):
+        dist_pattern = Utils.distort_data(pattern, 0.10)
+
+        value, _ = hopfield.recall(dist_pattern, n_iterations=15)
+        Utils.display_image(value, "{} pattern".format(j+1))
+        Utils.display_image(pattern,"Actual {}".format(j+1))
+
 
 if __name__ == "__main__":
     # ex_3_1_1()
     # ex_3_1_2()
     # ex_3_1_3()
     # ex_3_2()
-    plot_image()
-    ex_3_3__1_until_3()
+    # plot_image()
+    # ex_3_3__1_until_3()
 
-    ex_3_3_4()
-    ex_3_3_5()
+    # ex_3_3_4()
+    # ex_3_3_5()
     # ex_3_4()
+    ex_3_5()
