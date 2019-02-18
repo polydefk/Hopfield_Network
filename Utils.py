@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 
 def display_image(image, title):
     image = np.reshape(image, (32, 32))
-
+    plt.clf()
     plt.figure()
     plt.imshow(image)
     plt.title(title)
     plt.grid(True)
-    # plt.savefig('pictures/3_2_3/{}.png'.format(title.replace(' ', '_')))
-    plt.show()
+    plt.savefig('pictures/3_2_3/{}.png'.format(title.replace(' ', '_')))
+    # plt.show()
 
 
 def distort_data(pattern, percentage):

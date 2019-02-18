@@ -3,8 +3,10 @@ import numpy as np
 import Utils
 import matplotlib.pyplot as plt
 
+
 class Hopfield(object):
-    def __init__(self, memory_patterns, activity=None, method=None, random_weights=False, make_weights_symmetric=False, sparse_weight=False):
+    def __init__(self, memory_patterns, activity=None, method=None, random_weights=False, make_weights_symmetric=False,
+                 sparse_weight=False):
         self.memory_patterns = memory_patterns
         self.method = method
         self.random_weights = random_weights
@@ -43,7 +45,7 @@ class Hopfield(object):
 
         if self.sparse_weight:
             for pattern in memory_patterns:
-                pattern = np.subtract(pattern,self.activity)
+                pattern = np.subtract(pattern, self.activity)
                 self.weight_matrix = np.add(np.outer(pattern.T, pattern), self.weight_matrix)
         else:
             for pattern in memory_patterns:
@@ -51,7 +53,7 @@ class Hopfield(object):
 
         np.fill_diagonal(self.weight_matrix, 0)
 
-    def recall(self, pattern, n_iterations=None, method=None, calculate_energy=False, plot=False):
+    def recall(self, pattern, number_of_dataset, n_iterations=None, method=None, calculate_energy=False, plot=False):
         """:returns the attractor if this pattern is attractor
             or the pattern that minimizes the error
             or nothing"""
@@ -87,11 +89,10 @@ class Hopfield(object):
             if self.sparse_weight:
                 new_x = update(pattern, 0)
             else:
-                new_x = update(pattern)
+                new_x = update(pattern, number_of_dataset, iter)
 
             if calculate_energy:
                 energy.append(self.calculate_energy(new_x))
-
 
             if pattern.tolist() in self.memory_patterns.tolist():
                 print("recalled")
@@ -103,7 +104,6 @@ class Hopfield(object):
             if np.array_equal(pattern, new_x):
                 print("Converged but not recalled")
                 return [pattern, np.array(energy)]
-
 
             pattern = new_x.copy()
 
@@ -121,37 +121,40 @@ class Hopfield(object):
 
         return result
 
-    def update_random(self, pattern):
+    def update_random(self, pattern, n_dataset, iter):
         dimension = pattern.shape[0]
         new = pattern.copy()
-        for count in range(3000):
+        for count in range(dimension):
             i = np.random.randint(0, dimension)
             new[i] = np.where(np.dot(self.weight_matrix[i], pattern) > 0, 1, -1)
-
-            if i % 100 == 0:
+            if count % 300 == 0:
                 plt.clf()
                 plt.imshow(new.reshape((32, 32)).T)
+                title = "{0} dataset with random update {1} iteration".format(n_dataset, dimension * iter + count)
+                plt.savefig('pictures/3_2_3/{}.png'.format(title.replace(' ', '_')))
                 plt.pause(1e-4)
 
             pattern = new.copy()
 
         return new
 
-    def update_async(self, pattern):
+    def update_async(self, pattern, n_dataset, iter):
         dimension = pattern.shape[0]
 
         new = pattern.copy()
         for i in range(dimension):
-            new[i]= np.where(np.dot(self.weight_matrix[i], pattern) > 0, 1, -1)
-            if i % 100 == 0:
+            new[i] = np.where(np.dot(self.weight_matrix[i], pattern) > 0, 1, -1)
+
+            if i % 300 == 0:
                 plt.clf()
                 plt.imshow(new.reshape((32, 32)).T)
+                title = "{0} dataset with async update {1} iteration".format(n_dataset, dimension * iter + i)
+                plt.savefig('pictures/3_2_3/{}.png'.format(title.replace(' ', '_')))
                 plt.pause(1e-4)
 
             pattern = new.copy()
 
         return new
-
 
     def calculate_energy(self, training_data):
 

@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 np.random.seed(0)
 
 
-
 def check_stability(hopfield, distorted, memory_patterns):
     if len(distorted.shape) < 2:
         distorted = np.reshape(distorted, (1, len(distorted)))
@@ -132,14 +131,16 @@ def ex_3_3__1_until_3():
 
     hopfield = Hopfield(train_patterns)
     hopfield.train()
-
+    patterns = dataset[8:10]
     # 3.3.3 Follow how the energy changes from iteration to iteration
     # when you use the sequential update rule to approach an attractor.
-    for i in range(len(dataset)):
+    for i in range(len(patterns)):
         recalled, energy = (
-            hopfield.recall(dataset[i], n_iterations=10, method='Async', calculate_energy=True, plot=True))
-        recalled, energy = (
-            hopfield.recall(dataset[i], n_iterations=10, method='Random', calculate_energy=True, plot=True))
+            hopfield.recall(dataset[i + 9], number_of_dataset=i + 9, n_iterations=10, method='Async',
+                            calculate_energy=True, plot=True))
+        # recalled, energy = (
+        #     hopfield.recall(dataset[i + 9], number_of_dataset=i + 9, n_iterations=10, method='Random',
+        #                     calculate_energy=True, plot=True))
 
         # Utils.plot_energy_line(np.array(energy), 'Energy',
         #                        'Energy random asynchronous update to approach a test point.')
