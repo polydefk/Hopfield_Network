@@ -1,10 +1,10 @@
 import random
 import numpy as np
 import Utils
-
+import matplotlib.pyplot as plt
 
 class Hopfield(object):
-    def __init__(self, memory_patterns, activity, method='Batch', random_weights=False, make_weights_symmetric=False, sparse_weight=False):
+    def __init__(self, memory_patterns, activity=None, method=None, random_weights=False, make_weights_symmetric=False, sparse_weight=False):
         self.memory_patterns = memory_patterns
         self.method = method
         self.random_weights = random_weights
@@ -49,7 +49,7 @@ class Hopfield(object):
             for pattern in memory_patterns:
                 self.weight_matrix = np.add(np.outer(np.transpose(pattern), pattern), self.weight_matrix)
 
-        # np.fill_diagonal(self.weight_matrix, 0)
+        np.fill_diagonal(self.weight_matrix, 0)
 
     def recall(self, pattern, n_iterations=None, method=None, calculate_energy=False, plot=False):
         """:returns the attractor if this pattern is attractor
@@ -74,10 +74,10 @@ class Hopfield(object):
             update = self.update_synchronous_batch
 
         if self.method is "Random":
-            update = self.update_asynchronous_random
+            update = self.update_random
 
         if self.method is "Async":
-            update = self.update_asynchronous
+            update = self.update_async
 
         if self.sparse_weight:
             update = self.update_sparse
@@ -92,14 +92,20 @@ class Hopfield(object):
             if calculate_energy:
                 energy.append(self.calculate_energy(new_x))
 
-            if np.array_equal(pattern, new_x):
-                print('found attractor at iter : {0} '.format(iter))
+
+            if pattern.tolist() in self.memory_patterns.tolist():
+                print("recalled")
+                plt.clf()
+                plt.imshow(new_x.reshape((32, 32)).T)
+                plt.pause(1)
                 return [pattern, np.array(energy)]
 
-            pattern = new_x.copy()
+            if np.array_equal(pattern, new_x):
+                print("Converged but not recalled")
+                return [pattern, np.array(energy)]
 
-            if iter % 150 == 0 and plot:
-                Utils.display_image(pattern, 'recalled picture at {0}th iteration'.format(iter))
+
+            pattern = new_x.copy()
 
             if iter == n_iterations:
                 break
@@ -115,32 +121,37 @@ class Hopfield(object):
 
         return result
 
-    def update_asynchronous_random(self, x):
-        result = np.zeros(len(x))
-        order = np.arange(len(x))
-        np.random.shuffle(order)
+    def update_random(self, pattern):
+        dimension = pattern.shape[0]
+        new = pattern.copy()
+        for count in range(3000):
+            i = np.random.randint(0, dimension)
+            new[i] = np.where(np.dot(self.weight_matrix[i], pattern) > 0, 1, -1)
 
-        for i in order:
-            value = np.dot(self.weight_matrix[i], x)
+            if i % 100 == 0:
+                plt.clf()
+                plt.imshow(new.reshape((32, 32)).T)
+                plt.pause(1e-4)
 
-            if value >= 0:
-                result[i] = 1
-            else:
-                result[i] = -1
-        return result
+            pattern = new.copy()
 
-    def update_asynchronous(self, x):
-        result = np.zeros(len(x))
+        return new
 
-        for i in range(len(x)):
-            # value = np.dot(self.weight_matrix[i], x)
-            value = np.sum(np.multiply(self.weight_matrix[i, :], x))
+    def update_async(self, pattern):
+        dimension = pattern.shape[0]
 
-            if value >= 0:
-                result[i] = 1
-            else:
-                result[i] = -1
-        return result
+        new = pattern.copy()
+        for i in range(dimension):
+            new[i]= np.where(np.dot(self.weight_matrix[i], pattern) > 0, 1, -1)
+            if i % 100 == 0:
+                plt.clf()
+                plt.imshow(new.reshape((32, 32)).T)
+                plt.pause(1e-4)
+
+            pattern = new.copy()
+
+        return new
+
 
     def calculate_energy(self, training_data):
 
