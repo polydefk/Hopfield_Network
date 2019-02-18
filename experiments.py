@@ -13,7 +13,7 @@ def check_stability(hopfield, distorted, memory_patterns):
 
     stability = []
     for i, pattern in enumerate(distorted):
-        value, _ = hopfield.recall(pattern)
+        value, _ = hopfield.recall(pattern, 0)
 
         print("The case of x{}d is {}"
               .format(i, np.array_equal(value, memory_patterns[i])))
@@ -275,12 +275,12 @@ def ex_3_6():
 
     hopfield = Hopfield(memory_patterns, 0.1, sparse_weight=True)
     hopfield.train()
-
-    distorted = np.array([[1, 1, 1, 1, 1, 0, 1, 1]])
-
-    distorted = np.repeat(distorted, 3, axis=0)
-
-    print(check_stability(hopfield, distorted, memory_patterns))
+    for pattern in memory_patterns:
+        value, _ = hopfield.recall(pattern, 0)
+        print(value)
+    # distorted = np.array([[1, 1, 1, 1, 1, 0, 1, 1]])
+    #
+    # distorted = np.repeat(distorted, 3, axis=0)
 
 
 if __name__ == "__main__":
@@ -288,10 +288,11 @@ if __name__ == "__main__":
     # ex_3_1_2()
     # ex_3_1_3()
     # ex_3_2()
-    ex_3_3__1_until_3()
+    # ex_3_3__1_until_3()
     # ex_3_3_4()
     # ex_3_3_5()
     # ex_3_4()
     # ex_3_5()
     # run_3_1_seq()
+    ex_3_6()
     pass
