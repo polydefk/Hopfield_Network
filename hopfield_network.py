@@ -18,7 +18,7 @@ class Hopfield(object):
         """ Initilize the weights with zeros except the diagonal which is NaN
             :returns the initialized matrix matrix
         """
-        N = self.memory_patterns.shape[1]
+        N = len(self.memory_patterns)
         matrix = np.zeros((N, N))
 
         if self.random_weights:
@@ -101,9 +101,9 @@ class Hopfield(object):
                 plt.pause(1)
                 return [pattern, np.array(energy)]
 
-            if np.array_equal(pattern, new_x):
-                print("Converged but not recalled")
-                return [pattern, np.array(energy)]
+            # if np.array_equal(pattern, new_x):
+            #     print("Converged but not recalled")
+            #     return [pattern, np.array(energy)]
 
             pattern = new_x.copy()
 
@@ -113,7 +113,7 @@ class Hopfield(object):
             iter += 1
         return [pattern, np.array(energy)]
 
-    def update_synchronous_batch(self, x):
+    def update_synchronous_batch(self, x, n_dataset, iter):
         """:returns"""
         result = np.dot(self.weight_matrix, x)
         result[result >= 0] = 1.
@@ -127,12 +127,12 @@ class Hopfield(object):
         for count in range(dimension):
             i = np.random.randint(0, dimension)
             new[i] = np.where(np.dot(self.weight_matrix[i], pattern) > 0, 1, -1)
-            if count % 300 == 0:
-                plt.clf()
-                plt.imshow(new.reshape((32, 32)).T)
-                title = "{0} dataset with random update {1} iteration".format(n_dataset, dimension * iter + count)
-                plt.savefig('pictures/3_2_3/{}.png'.format(title.replace(' ', '_')))
-                plt.pause(1e-4)
+            # if count % 300 == 0:
+            #     plt.clf()
+            #     plt.imshow(new.reshape((32, 32)).T)
+            #     title = "{0} dataset with random update {1} iteration".format(n_dataset, dimension * iter + count)
+            #     plt.savefig('pictures/3_2_3/{}.png'.format(title.replace(' ', '_')))
+            #     plt.pause(1e-4)
 
             pattern = new.copy()
 
@@ -144,13 +144,13 @@ class Hopfield(object):
         new = pattern.copy()
         for i in range(dimension):
             new[i] = np.where(np.dot(self.weight_matrix[i], pattern) > 0, 1, -1)
-
-            if i % 300 == 0:
-                plt.clf()
-                plt.imshow(new.reshape((32, 32)).T)
-                title = "{0} dataset with async update {1} iteration".format(n_dataset, dimension * iter + i)
-                plt.savefig('pictures/3_2_3/{}.png'.format(title.replace(' ', '_')))
-                plt.pause(1e-4)
+            #
+            # if i % 300 == 0:
+            #     plt.clf()
+            #     plt.imshow(new.reshape((32, 32)).T)
+            #     title = "{0} dataset with async update {1} iteration".format(n_dataset, dimension * iter + i)
+            #     plt.savefig('pictures/3_2_3/{}.png'.format(title.replace(' ', '_')))
+            #     plt.pause(1e-4)
 
             pattern = new.copy()
 

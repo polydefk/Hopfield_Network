@@ -131,31 +131,35 @@ def ex_3_3__1_until_3():
 
     hopfield = Hopfield(train_patterns)
     hopfield.train()
-    patterns = dataset[8:10]
     # 3.3.3 Follow how the energy changes from iteration to iteration
     # when you use the sequential update rule to approach an attractor.
-    for i in range(len(patterns)):
+    for i in range(len(dataset)):
         recalled, energy = (
-            hopfield.recall(dataset[i + 9], number_of_dataset=i + 9, n_iterations=10, method='Async',
+            hopfield.recall(dataset[i], number_of_dataset=i, n_iterations=10, method='Random',
                             calculate_energy=True, plot=True))
-        # recalled, energy = (
-        #     hopfield.recall(dataset[i + 9], number_of_dataset=i + 9, n_iterations=10, method='Random',
-        #                     calculate_energy=True, plot=True))
+        print("Energy for pattern {} is {}".format(i + 1, energy))
 
-        # Utils.plot_energy_line(np.array(energy), 'Energy',
-        #                        'Energy random asynchronous update to approach a test point.')
+        Utils.plot_energy_line(np.array(energy), 'Energy',
+                               'Energy random asynchronous update to approach a test point.')
 
 
 def ex_3_3_4():
     dataset = np.loadtxt('pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
     train_patterns = dataset[0:3].copy()
+    dim = 1024
+    start_state = np.random.randn(dim)
+    method = ['Random', 'Async']
+    for m in method:
+        hopfield = Hopfield(start_state, random_weights=True, method=m,make_weights_symmetric=True)
+        hopfield.train()
+        # hopfield.weight_matrix = np.random.randn(dim, dim)
 
-    hopfield = Hopfield(train_patterns, random_weights=True)
-
-    start_state = np.random.normal(0, 1, len(dataset[0]))
-
-    recalled, energy = hopfield.recall(dataset[10], n_iterations=100, method='Random', calculate_energy=True)
-    Utils.plot_energy_line(energy, 'Energy', 'Energy random asynchronous update using random weights')
+        pattern = Utils.generate_random_pattern(train_patterns.shape[1])
+        recalled, energy = hopfield.recall(pattern, 1, calculate_energy=True, n_iterations=50)
+        # print(energy)
+        # Utils.display_image(recalled, '')
+        # recalled, energy = hopfield.recall(dataset[10], n_iterations=100, method='Random', calculate_energy=True)
+        Utils.plot_energy_line(energy, 'Energy', 'Energy using {} update using symmetric weights'.format(m))
 
 
 def ex_3_3_5():
@@ -230,8 +234,6 @@ def ex_3_5():
                 # dist_pattern = Utils.distort_data(pattern, 0)
 
                 value, _ = hopfield.recall(pattern, n_iterations=15)
-                # Utils.display_image(value, "{} pattern".format(j+1))
-                # Utils.display_image(pattern,"Actual {}".format(j+1))
                 local_accuracy.append(Utils.check_performance(pattern, value))
 
             print(
@@ -259,8 +261,6 @@ def ex_3_5():
                 # dist_pattern = Utils.distort_data(pattern, 0)
 
                 value, _ = hopfield.recall(pattern, n_iterations=15)
-                # Utils.display_image(value, "{} pattern".format(j+1))
-                # Utils.display_image(pattern,"Actual {}".format(j+1))
                 local_accuracy.append(Utils.check_performance(pattern, value))
             value = np.mean(np.array(local_accuracy))
             values.append(value)
@@ -289,10 +289,10 @@ if __name__ == "__main__":
     # ex_3_1_3()
     # ex_3_2()
     # ex_3_3__1_until_3()
-    # ex_3_3_4()
+    ex_3_3_4()
     # ex_3_3_5()
     # ex_3_4()
     # ex_3_5()
     # run_3_1_seq()
-    ex_3_6()
+    # ex_3_6()
     pass
