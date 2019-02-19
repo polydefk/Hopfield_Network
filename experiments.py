@@ -258,18 +258,57 @@ def ex_3_5():
 
 
 def ex_3_6():
-    memory_patterns = np.array([[0., 0., 1., 0., 1., 0., 0., 1.],
-                                [0., 0., 0., 0., 0., 1., 0., 0.],
-                                [0., 1., 1., 0., 0., 1., 0., 1.]])
+    N = 200
+    fire_neuros_percentage = 0.05
+    num = int(N * fire_neuros_percentage)
+    memory_patterns = np.zeros(shape=(N, N))
+    for i in range(N):
+        indices = np.random.randint(0, N, num)
+        memory_patterns[i][indices] = 1
 
-    hopfield = Hopfield(memory_patterns, 0.1, sparse_weight=True)
-    hopfield.train()
-    for pattern in memory_patterns:
-        value, _ = hopfield.recall(pattern, 0)
-        print(value)
-    # distorted = np.array([[1, 1, 1, 1, 1, 0, 1, 1]])
-    #
-    # distorted = np.repeat(distorted, 3, axis=0)
+    accuracy1 = []
+    accuracy2 = []
+    accuracy4 = []
+    accuracy6 = []
+    for i in range(1, N + 1):
+        temp = memory_patterns[0:i]
+        hopfield = Hopfield(temp, fire_neuros_percentage, sparse_weight=True, theta=0)
+        hopfield.train()
+        local_accuracy = []
+        for j, pattern in enumerate(temp):
+            value, _ = hopfield.recall(pattern, 0)
+            local_accuracy.append(Utils.check_performance(pattern, value))
+        accuracy1.append(np.mean(local_accuracy))
+
+        hopfield = Hopfield(temp, fire_neuros_percentage, sparse_weight=True, theta=0.01)
+        hopfield.train()
+        local_accuracy = []
+        for j, pattern in enumerate(temp):
+            value, _ = hopfield.recall(pattern, 0)
+            local_accuracy.append(Utils.check_performance(pattern, value))
+        accuracy2.append(np.mean(local_accuracy))
+
+        hopfield = Hopfield(temp, fire_neuros_percentage, sparse_weight=True, theta=0.1)
+        hopfield.train()
+        local_accuracy = []
+        for j, pattern in enumerate(temp):
+            value, _ = hopfield.recall(pattern, 0)
+            local_accuracy.append(Utils.check_performance(pattern, value))
+        accuracy4.append(np.mean(local_accuracy))
+
+        hopfield = Hopfield(temp, fire_neuros_percentage, sparse_weight=True, theta=-0.05)
+        hopfield.train()
+        local_accuracy = []
+        for j, pattern in enumerate(temp):
+            value, _ = hopfield.recall(pattern, 0)
+            local_accuracy.append(Utils.check_performance(pattern, value))
+        accuracy6.append(np.mean(local_accuracy))
+
+    accuracy = [accuracy1, accuracy2, accuracy4, accuracy6]
+
+    legend_names = ['theta = 0', 'theta = 0.01', 'theta = 0.1', 'theta = -0.05']
+
+    Utils.plot_multiple_accuracy(accuracy, N, legend_names, 'Accuracy with 5% activity')
 
 
 if __name__ == "__main__":

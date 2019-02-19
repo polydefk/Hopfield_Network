@@ -105,6 +105,25 @@ def show_images(images, rows, save_dir, titles=None):
     plt.savefig(save_dir)
 
 
+def plot_multiple_accuracy(accuracy, pattern_number, legend_names, title):
+    plt.figure()
+    plt.grid(True)
+
+    patterns = np.arange(0, pattern_number, 1)
+
+    for i in range(len(accuracy)):
+        plt.plot(patterns, accuracy[i], alpha=0.5)
+
+    plt.xlabel('Number of patterns')
+    plt.ylabel('Accuracy')
+    plt.ylim([-1, 101])
+    plt.title(title)
+    plt.legend(legend_names, loc='upper right')
+    # plt.legend('', loc='upper left')
+
+    plt.show()
+
+
 if __name__ == "__main__":
     dataset = np.loadtxt('pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
     #

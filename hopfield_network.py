@@ -6,13 +6,14 @@ import matplotlib.pyplot as plt
 
 class Hopfield(object):
     def __init__(self, memory_patterns, activity=None, method=None, random_weights=False, make_weights_symmetric=False,
-                 sparse_weight=False):
+                 sparse_weight=False, theta=None):
         self.memory_patterns = memory_patterns
         self.method = method
         self.random_weights = random_weights
         self.make_weights_symmetric = make_weights_symmetric
         self.sparse_weight = sparse_weight
         self.activity = activity
+        self.theta = theta
 
     def initialize_weights(self):
         """ Initilize the weights with zeros except the diagonal which is NaN
@@ -164,7 +165,7 @@ class Hopfield(object):
     def update_sparse(self, x, theta):
         value = 0
         for j in range(self.weight_matrix.shape[0]):
-            value += np.dot(self.weight_matrix[j], x[j]) - theta
+            value += np.dot(self.weight_matrix[j], x[j]) - self.theta
 
         value = np.sign(value)
         value[value == 0] = 1
