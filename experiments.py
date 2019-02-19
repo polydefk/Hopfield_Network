@@ -13,7 +13,7 @@ def check_stability(hopfield, distorted, memory_patterns):
 
     stability = []
     for i, pattern in enumerate(distorted):
-        value, _ = hopfield.recall(pattern, 0)
+        value, _, iter = hopfield.recall(pattern, 0)
 
         print("The case of x{}d is {}"
               .format(i, np.array_equal(value, memory_patterns[i])))
@@ -52,7 +52,7 @@ def ex_3_1_2():
     attractors = []
     for i in range(len(lst)):
         pattern = lst[i]
-        value, _ = hopfield.recall(pattern)
+        value, _, iter = hopfield.recall(pattern)
         if value is not None:
             attractors.append(value)
 
@@ -92,7 +92,7 @@ def ex_3_2():
         hopfield.train()
 
         p10 = dataset[9].copy()
-        recall_p10, _ = hopfield.recall(p10)
+        recall_p10, _, iter = hopfield.recall(p10)
 
         Utils.display_image(p10, title='actual picture p10')
         Utils.display_image(recall_p10, title='recalled picture p10')
@@ -102,7 +102,7 @@ def ex_3_2():
         p3 = dataset[2].copy()
         p11 = dataset[10].copy()
 
-        recall_p11, _ = hopfield.recall(p11)
+        recall_p11, _, iter = hopfield.recall(p11)
 
         Utils.display_image(p2, title='actual picture p2')
         Utils.display_image(p1, title='actual picture p1')
@@ -120,7 +120,7 @@ def ex_3_2():
 
         # Utils.display_image(p10, title='actual picture p10')
 
-        recalled, _ = hopfield.recall(p10, n_iterations=500, plot=True)
+        recalled, _, iter = hopfield.recall(p10, n_iterations=500, plot=True)
         Utils.display_image(recalled, 'Asynchronous random update. closest to first training example')
 
 
@@ -134,7 +134,7 @@ def ex_3_3__1_until_3():
     # 3.3.3 Follow how the energy changes from iteration to iteration
     # when you use the sequential update rule to approach an attractor.
     for i in range(len(dataset)):
-        recalled, energy = (
+        recalled, energy, iter = (
             hopfield.recall(dataset[i], number_of_dataset=i, n_iterations=10, method='Random',
                             calculate_energy=True, plot=True))
         print("Energy for pattern {} is {}".format(i + 1, energy))
@@ -155,7 +155,7 @@ def ex_3_3_4():
         # hopfield.weight_matrix = np.random.randn(dim, dim)
 
         pattern = Utils.generate_random_pattern(train_patterns.shape[1])
-        recalled, energy = hopfield.recall(pattern, 1, calculate_energy=True, n_iterations=50)
+        recalled, energy, iter = hopfield.recall(pattern, 1, calculate_energy=True, n_iterations=50)
         # print(energy)
         # Utils.display_image(recalled, '')
         # recalled, energy = hopfield.recall(dataset[10], n_iterations=100, method='Random', calculate_energy=True)
@@ -170,7 +170,7 @@ def ex_3_3_5():
 
     start_state = np.random.normal(0, 1, len(dataset[0]))
 
-    recalled, energy = hopfield.recall(dataset[10], n_iterations=100, method='Random', calculate_energy=True)
+    recalled, energy, iter = hopfield.recall(dataset[10], n_iterations=100, method='Random', calculate_energy=True)
     Utils.plot_energy_line(energy, 'Energy', 'Energy random asynchronous update using symmetric weights')
 
 
@@ -187,7 +187,7 @@ def ex_3_4():
 
             dist_pic = Utils.distort_data(pattern, percentage)
 
-            recalled, energy = hopfield.recall(dist_pic,  number_of_dataset=1, method='Batch')
+            recalled, energy, iter = hopfield.recall(dist_pic,  number_of_dataset=1, method='Batch')
 
             images = [np.reshape(dist_pic, (32, 32)), np.reshape(recalled, (32, 32))]
             titles = ["Distorted with {}% noise".format(percentage), "Recalled picture"]
@@ -220,46 +220,81 @@ def ex_3_5():
             hopfield.train()
             local_accuracy = []
             for j, pattern in enumerate(train_patterns):
-                # dist_pattern = Utils.distort_data(pattern, 0)
+                dist_pattern = Utils.distort_data(pattern, 0.1)
 
-                value, _ = hopfield.recall(pattern, n_iterations=15)
+                value, _, iter = hopfield.recall(dist_pattern, n_iterations=50)
+                # Utils.display_image(value, "{} pattern".format(j+1))
+                # Utils.display_image(pattern,"Actual {}".format(j+1))
                 local_accuracy.append(Utils.check_performance(pattern, value))
 
-            print(
-                "Accuracy {0} for {1} training patterns ".format(round(np.mean(local_accuracy), 1), i))
+            print("Accuracy {0} for {1} training patterns ".format(local_accuracy, i))
 
             accuracy.append(np.mean(local_accuracy))
-        Utils.plot_accuracy(np.array(accuracy), '')
+        Utils.plot_accuracy(np.array(accuracy), 'Accuracy on recalled patterns')
     if test_2:
 
-        train_patterns = dataset[0:3].copy()
+        # train_patterns = dataset[0:3].copy()
         randoms = []
-        for pt in train_patterns:
-            randoms.append(pt)
         values = []
+        # for pt in train_patterns:
+        #     randoms.append(pt)
 
-        for i in range(1024):
+        for i in range(30):
+            print(i)
 
-            randoms.append(np.array(Utils.generate_random_pattern()))
+            for j in range(10):
+                randoms.append(Utils.generate_random_pattern())
 
             local_accuracy = []
 
             hopfield = Hopfield(np.array(randoms))
             hopfield.train()
             for j, pattern in enumerate(randoms):
-                # dist_pattern = Utils.distort_data(pattern, 0)
+                dist_pattern = Utils.distort_data(pattern, 0.05)
 
-                value, _ = hopfield.recall(pattern, n_iterations=15)
+                value, _, iter = hopfield.recall(dist_pattern, n_iterations=15)
+                # print(iter)
+                # Utils.display_image(value, "{} pattern".format(j+1))
+                # Utils.display_image(pattern,"Actual {}".format(j+1))
                 local_accuracy.append(Utils.check_performance(pattern, value))
+            print("Accuracy {0} for {1} training patterns ".format(local_accuracy, i))
+
             value = np.mean(np.array(local_accuracy))
             values.append(value)
 
-        Utils.plot_accuracy(np.array(values), '{OLA}')
+        Utils.plot_accuracy(np.array(values), 'Accuracy on recalled random patterns')
+
+def ex_3_5_4():
+    random_patterns = np.array(Utils.generate_random_pattern(N=(300,100)))
+
+    # for j, pattern in enumerate(random_patterns):
+    #     random_patterns[j,:] = Utils.distort_data(pattern, 0.1)
+
+    stable_patterns = []
+    for i in range(1,250):
+        print(i)
+        training_data = random_patterns[0:i]
+        hopfield = Hopfield(training_data)
+        hopfield.train()
+
+        count = 0
+        for j, pattern in enumerate(training_data):
+
+            # value, _, iteration_finished = hopfield.recall(pattern, n_iterations=3)
+            # if iteration_finished == 1:
+
+            if hopfield.is_stable(hopfield.weight_matrix, pattern):
+                count += 1
+        print('number of correct {0} , {1}'.format(count, count/len(training_data)))
+        stable_patterns.append(count/len(training_data))
+
+    Utils.plot_stable_patterns(np.array(stable_patterns),
+                               'Stability of patterns no noise, diagonal zero, biased patterns')
 
 
 def ex_3_6():
     N = 200
-    fire_neuros_percentage = 0.05
+    fire_neuros_percentage = 0.
     num = int(N * fire_neuros_percentage)
     memory_patterns = np.zeros(shape=(N, N))
     for i in range(N):
@@ -276,7 +311,7 @@ def ex_3_6():
         hopfield.train()
         local_accuracy = []
         for j, pattern in enumerate(temp):
-            value, _ = hopfield.recall(pattern, 0)
+            value, _, iter = hopfield.recall(pattern, 0)
             local_accuracy.append(Utils.check_performance(pattern, value))
         accuracy1.append(np.mean(local_accuracy))
 
@@ -284,7 +319,7 @@ def ex_3_6():
         hopfield.train()
         local_accuracy = []
         for j, pattern in enumerate(temp):
-            value, _ = hopfield.recall(pattern, 0)
+            value, _, iter = hopfield.recall(pattern, 0)
             local_accuracy.append(Utils.check_performance(pattern, value))
         accuracy2.append(np.mean(local_accuracy))
 
@@ -292,7 +327,7 @@ def ex_3_6():
         hopfield.train()
         local_accuracy = []
         for j, pattern in enumerate(temp):
-            value, _ = hopfield.recall(pattern, 0)
+            value, _, iter = hopfield.recall(pattern, 0)
             local_accuracy.append(Utils.check_performance(pattern, value))
         accuracy4.append(np.mean(local_accuracy))
 
@@ -300,7 +335,7 @@ def ex_3_6():
         hopfield.train()
         local_accuracy = []
         for j, pattern in enumerate(temp):
-            value, _ = hopfield.recall(pattern, 0)
+            value, _, iter = hopfield.recall(pattern, 0)
             local_accuracy.append(Utils.check_performance(pattern, value))
         accuracy6.append(np.mean(local_accuracy))
 
@@ -319,7 +354,8 @@ if __name__ == "__main__":
     # ex_3_3__1_until_3()
     # ex_3_3_4()
     # ex_3_3_5()
-    ex_3_4()
+    # ex_3_4()
     # ex_3_5()
+    # ex_3_5_4()
     # run_3_1_seq()
-    # ex_3_6()
+    ex_3_6()

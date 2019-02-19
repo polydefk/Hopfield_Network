@@ -69,6 +69,8 @@ def plot_energy_line(energy, legend_names, title):
 
 def generate_random_pattern(N=1024):
     pattern = np.random.normal(0, 1, size=N)
+    pattern = pattern
+
     pattern[pattern >= 0] = 1
     pattern[pattern < 0] = -1
     # pattern = np.array(np.where(np.random.normal(0, 1, size=N) >= 0, 1, -1))
@@ -79,7 +81,8 @@ def plot_accuracy(accuracy, title):
     plt.figure()
     plt.grid(True)
 
-    plt.plot(accuracy)
+    # plt.plot(np.arange(0,300,10),accuracy)
+    plt.plot(np.arange(0,len(accuracy),1),accuracy)
 
     plt.xlabel('Number of patterns')
     plt.ylabel('Accuracy')
@@ -88,6 +91,21 @@ def plot_accuracy(accuracy, title):
     # plt.legend('', loc='upper left')
 
     plt.show()
+
+def plot_stable_patterns(patterns, title):
+    plt.figure()
+    plt.grid(True)
+
+    plt.plot(patterns)
+
+    plt.xlabel('Number of patterns')
+    plt.ylabel('Number of stable patterns')
+    plt.ylim([0, 1])
+    plt.title(title)
+    # plt.legend('', loc='upper left')
+
+    plt.show()
+
 
 
 def show_images(images, rows, save_dir, titles=None):

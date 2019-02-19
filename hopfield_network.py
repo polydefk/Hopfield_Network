@@ -54,7 +54,7 @@ class Hopfield(object):
 
         np.fill_diagonal(self.weight_matrix, 0)
 
-    def recall(self, pattern, number_of_dataset, n_iterations=None, method=None, calculate_energy=False):
+    def recall(self, pattern, number_of_dataset = -1, n_iterations=None, method=None, calculate_energy=False, plot=False):
         """:returns the attractor if this pattern is attractor
             or the pattern that minimizes the error
             or nothing"""
@@ -86,7 +86,6 @@ class Hopfield(object):
             update = self.update_sparse
 
         while True:
-            new_x = []
             if self.sparse_weight:
                 new_x = update(pattern, 0)
             else:
@@ -96,15 +95,15 @@ class Hopfield(object):
                 energy.append(self.calculate_energy(new_x))
 
             if pattern.tolist() in self.memory_patterns.tolist():
-                print("recalled")
+                # print("recalled")
                 # plt.clf()
                 # plt.imshow(new_x.reshape((32, 32)).T)
                 # plt.pause(1)
-                return [pattern, np.array(energy)]
+                return [pattern, np.array(energy),iter]
 
             if np.array_equal(pattern, new_x):
-                print("Converged but not recalled")
-                return [pattern, np.array(energy)]
+                # print("Converged but not recalled")
+                return [pattern, np.array(energy), iter]
 
             pattern = new_x.copy()
 
@@ -112,7 +111,7 @@ class Hopfield(object):
                 break
 
             iter += 1
-        return [pattern, np.array(energy)]
+        return [pattern, np.array(energy), iter]
 
     def update_synchronous_batch(self, x, n_dataset, iter):
         """:returns"""
@@ -128,12 +127,12 @@ class Hopfield(object):
         for count in range(dimension):
             i = np.random.randint(0, dimension)
             new[i] = np.where(np.dot(self.weight_matrix[i], pattern) > 0, 1, -1)
-            # if count % 300 == 0:
-            #     plt.clf()
-            #     plt.imshow(new.reshape((32, 32)).T)
-            #     title = "{0} dataset with random update {1} iteration".format(n_dataset, dimension * iter + count)
-            #     plt.savefig('pictures/3_2_3/{}.png'.format(title.replace(' ', '_')))
-            #     plt.pause(1e-4)
+            if count % 300 == 0:
+                plt.clf()
+                plt.imshow(new.reshape((32, 32)).T)
+                title = "{0} dataset with random update {1} iteration".format(n_dataset, dimension * iter + count)
+                plt.savefig('pictures/3_2_3/{}.png'.format(title.replace(' ', '_')))
+                plt.pause(1e-4)
 
             pattern = new.copy()
 
@@ -145,17 +144,28 @@ class Hopfield(object):
         new = pattern.copy()
         for i in range(dimension):
             new[i] = np.where(np.dot(self.weight_matrix[i], pattern) > 0, 1, -1)
-            #
-            # if i % 300 == 0:
-            #     plt.clf()
-            #     plt.imshow(new.reshape((32, 32)).T)
-            #     title = "{0} dataset with async update {1} iteration".format(n_dataset, dimension * iter + i)
-            #     plt.savefig('pictures/3_2_3/{}.png'.format(title.replace(' ', '_')))
-            #     plt.pause(1e-4)
+
+            if i % 300 == 0:
+                plt.clf()
+                plt.imshow(new.reshape((32, 32)).T)
+                title = "{0} dataset with async update {1} iteration".format(n_dataset, dimension * iter + i)
+                plt.savefig('pictures/3_2_3/{}.png'.format(title.replace(' ', '_')))
+                plt.pause(1e-4)
 
             pattern = new.copy()
 
         return new
+
+    def is_stable(self, weights, pattern):
+
+        result = np.dot(weights, pattern)
+        result[result >= 0] = 1.
+        result[result < 0] = -1.
+
+        if np.array_equal(result, pattern):
+            return True
+
+        return False
 
     def calculate_energy(self, training_data):
 
