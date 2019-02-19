@@ -150,7 +150,7 @@ def ex_3_3_4():
     start_state = np.random.randn(dim)
     method = ['Random', 'Async']
     for m in method:
-        hopfield = Hopfield(start_state, random_weights=True, method=m,make_weights_symmetric=True)
+        hopfield = Hopfield(start_state, random_weights=True, method=m, make_weights_symmetric=True)
         hopfield.train()
         # hopfield.weight_matrix = np.random.randn(dim, dim)
 
@@ -181,32 +181,21 @@ def ex_3_4():
     hopfield = Hopfield(train_patterns)
     hopfield.train()
 
-    print("original First Image")
-    Utils.display_image(train_patterns[0], 'Original')
-    for percentage in range(10):
-        percentage = percentage / 10 + 0.1
-        print(percentage)
-        dist_pic = Utils.distort_data(train_patterns[0], percentage)
-        recalled, energy = hopfield.recall(dist_pic, n_iterations=100)
-        Utils.display_image(recalled, "distorting {}%".format(percentage * 100))
+    for idx, pattern in enumerate(train_patterns):
+        for percentage in range(100):
+            percentage = percentage / 100 + 0.01
 
-    print("original Second Image")
-    Utils.display_image(train_patterns[1], 'Original')
-    for percentage in range(10):
-        percentage = percentage / 10 + 0.1
+            dist_pic = Utils.distort_data(pattern, percentage)
 
-        dist_pic = Utils.distort_data(train_patterns[1], percentage)
-        recalled, energy = hopfield.recall(dist_pic, n_iterations=100)
-        Utils.display_image(recalled, "distorting {}%".format(percentage * 100))
+            recalled, energy = hopfield.recall(dist_pic,  number_of_dataset=1, method='Batch')
 
-    print("original Third Image")
-    Utils.display_image(train_patterns[2], 'Original')
-    for percentage in range(10):
-        percentage = percentage / 10 + 0.1
+            images = [np.reshape(dist_pic, (32, 32)), np.reshape(recalled, (32, 32))]
+            titles = ["Distorted with {}% noise".format(percentage), "Recalled picture"]
 
-        dist_pic = Utils.distort_data(train_patterns[2], percentage)
-        recalled, energy = hopfield.recall(dist_pic, n_iterations=100)
-        Utils.display_image(recalled, "distorting {}%".format(percentage * 100))
+            fname = 'pattern_{0}_percent_{1}'.format(idx + 1, round(percentage, 3))
+            save_dir = 'pictures/3_4/{0}.png'.format(fname)
+
+            Utils.show_images(images, save_dir=save_dir, rows=1, titles=titles)
 
 
 def plot_image():
@@ -289,10 +278,9 @@ if __name__ == "__main__":
     # ex_3_1_3()
     # ex_3_2()
     # ex_3_3__1_until_3()
-    ex_3_3_4()
+    # ex_3_3_4()
     # ex_3_3_5()
-    # ex_3_4()
+    ex_3_4()
     # ex_3_5()
     # run_3_1_seq()
     # ex_3_6()
-    pass

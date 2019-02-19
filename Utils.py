@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pylab as pb
 
 
 def display_image(image, title):
@@ -13,18 +14,11 @@ def display_image(image, title):
 
 
 def distort_data(pattern, percentage):
-    dim = pattern.size
-
-    n_dist = int(dim * percentage)
-    numbers = np.arange(dim)
-    np.random.shuffle(numbers)
-
-    # idxs = np.random.choice(np.arange(dim), n_dist)
-
+    N = pattern.size
+    n_dist = int(N * percentage)
+    idxs = np.random.choice(np.arange(N), n_dist)
     dist_pattern = pattern.copy()
-
-    dist_pattern[:int(numbers * percentage)] *= (-1)
-    # np.random.shuffle(dist_pattern[:n_dist])
+    dist_pattern[idxs] *= -1
 
     return dist_pattern
 
@@ -96,12 +90,27 @@ def plot_accuracy(accuracy, title):
     plt.show()
 
 
+def show_images(images, rows, save_dir, titles=None):
+    assert ((titles is None) or (len(images) == len(titles)))
+
+    n_images = len(images)
+    if titles is None: titles = ['Image (%d)' % i for i in range(1, n_images + 1)]
+    fig = plt.figure()
+    for n, (image, title) in enumerate(zip(images, titles)):
+        a = fig.add_subplot(rows, np.ceil(n_images / float(rows)), n + 1)
+        plt.imshow(image)
+        a.set_title(title)
+    fig.set_size_inches(np.array(fig.get_size_inches()) * n_images)
+    # plt.pause(0.00001)
+    plt.savefig(save_dir)
+
+
 if __name__ == "__main__":
     dataset = np.loadtxt('pict.dat', delimiter=",", dtype=int).reshape(-1, 1024)
     #
     train_pattern = dataset[0].copy()
     #
-    # dist = distort_data(train_pattern, 0.1)
-    # check_performance(train_pattern, dist)
-    pattern = generate_random_pattern(len(train_pattern))
-    display_image(pattern,'')
+    dist = distort_data(train_pattern, 0.9
+                        )
+    images = [np.reshape(train_pattern, (32, 32)), np.reshape(dist, (32, 32))]
+    show_images(images, rows=1)

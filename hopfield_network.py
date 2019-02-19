@@ -18,7 +18,7 @@ class Hopfield(object):
         """ Initilize the weights with zeros except the diagonal which is NaN
             :returns the initialized matrix matrix
         """
-        N = len(self.memory_patterns)
+        N = self.memory_patterns.shape[1]
         matrix = np.zeros((N, N))
 
         if self.random_weights:
@@ -53,7 +53,7 @@ class Hopfield(object):
 
         np.fill_diagonal(self.weight_matrix, 0)
 
-    def recall(self, pattern, number_of_dataset, n_iterations=None, method=None, calculate_energy=False, plot=False):
+    def recall(self, pattern, number_of_dataset, n_iterations=None, method=None, calculate_energy=False):
         """:returns the attractor if this pattern is attractor
             or the pattern that minimizes the error
             or nothing"""
@@ -96,14 +96,14 @@ class Hopfield(object):
 
             if pattern.tolist() in self.memory_patterns.tolist():
                 print("recalled")
-                plt.clf()
-                plt.imshow(new_x.reshape((32, 32)).T)
-                plt.pause(1)
+                # plt.clf()
+                # plt.imshow(new_x.reshape((32, 32)).T)
+                # plt.pause(1)
                 return [pattern, np.array(energy)]
 
-            # if np.array_equal(pattern, new_x):
-            #     print("Converged but not recalled")
-            #     return [pattern, np.array(energy)]
+            if np.array_equal(pattern, new_x):
+                print("Converged but not recalled")
+                return [pattern, np.array(energy)]
 
             pattern = new_x.copy()
 
